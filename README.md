@@ -1,0 +1,1 @@
+A dark fantasy incremental clicker game inspired by the Berserk universe. Step into the shoes of Guts and embark on a bloody journey through Midland, battling apostles and collecting blood to become stronger.
