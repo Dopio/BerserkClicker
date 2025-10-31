@@ -6,11 +6,10 @@ import random
 def fight_with_enemy(player, enemy):
     print('Fight is start! '
           f"Enemy: {enemy.name} (HP: {enemy.health})\n")
-    current_enemy = Mob(enemy.name, enemy.health, enemy.damage, enemy.gold_reward)
-    while current_enemy.health > 0:
-        player.player_attack(current_enemy)
+    while enemy.health > 0:
+        player.player_attack(enemy)
     player.player_kills += 1
-    print(f'{current_enemy.name} is Dead!')
+    print(f'{enemy.name} is Dead!')
 
 
 def game_loop():
