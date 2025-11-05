@@ -1,4 +1,4 @@
-class Player:
+﻿class Player:
     def __init__(self, player_name, player_blood, player_kills, player_damage, player_health):
         self.player_name = player_name
         self.player_blood = player_blood
@@ -25,12 +25,19 @@ class Player:
         if self.player_health <= 0:
             return "Death"
 
+    def player_heal(self, heal):
+        self.player_health += heal
+        print(f'Healing potion is drink! Now you have {self.player_health} HP\n')
+
     def buy_upgrade(self):
         print(f'Which upgrade you want? '
               f'You have {self.player_blood} for updates')
+
         print(f'1) Increase your damage: +1   (cost 2 blood)\n'
               f'2) Increase your damage: +2   (cost 5 blood)\n'
-              f'3) Increase your damage: +3   (cost 8 blood)')
+              f'3) Increase your damage: +3   (cost 8 blood)\n'
+              f'4) Heal potion: +5 HP (cost 2 blood)')
+
         player_choice = int(input())
         if player_choice == 1 and self.player_blood >= 2:
             self.player_damage += 1
@@ -44,6 +51,10 @@ class Player:
             self.player_damage += 3
             self.player_blood -= 8
             print(f'Your damage now is: {self.player_damage}')
+        elif player_choice == 4 and self.player_blood >= 2:
+            self.player_health += 5
+            self.player_blood -= 2
+            print(f'Your HP now is: {self.player_health}')
         else:
             print('Not enough blood')
 

@@ -63,7 +63,6 @@ def game_loop():
             print('Unwrite choice')
 
 
-
 if __name__ == "__main__":
     print('KILL THEM ALL')
     game_loop()
