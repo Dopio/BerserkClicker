@@ -1,6 +1,30 @@
-from entities import Player, Mob
+from entities import Player
 from enemies import basic_enemies
 import random
+import json
+
+
+def save_game(player):
+    try:
+        with open('savegame.json', 'w') as f:
+            json.dump(player.to_dict(), f)
+        print("Game saved successfully!")
+    except Exception as e:
+        print(f"Save failed: {e}")
+
+
+def load_game():
+    try:
+        with open('savegame.json', 'r') as f:
+            data = json.load(f)
+        print('Game loaded successfully!')
+        return Player.from_dict_to_class(data)
+    except FileNotFoundError:
+        print('No save file found. Starting new game.')
+        return None
+    except Exception as e:
+        print(f'Loaded failed: {e}')
+        return None
 
 
 def fight_with_enemy(player, enemy):
@@ -21,14 +45,19 @@ def fight_with_enemy(player, enemy):
 
 
 def game_loop():
-    player1 = Player('Guts', 0, 0, 1, 10)
+
+    player1 = load_game()
+
+    if player1 is None:
+        player1 = Player('Guts', 0, 0, 1, 10)
 
     while player1.player_health > 0:
         print(f'1) Show all enemy\n'
               f'2) Attack random enemy\n'
               f'3) Update shop\n'
               f'4) Show stats\n'
-              f'5) End game')
+              f'5) Save game\n'
+              f'6) End game')
         player_choice = int(input('Your choice: '))
         print('\n')
         if player_choice == 1:
@@ -55,12 +84,16 @@ def game_loop():
         elif player_choice == 4:
             print('\n')
             player1.show_player_stats()
-            print('\n')
         elif player_choice == 5:
+            save_game(player1)
+        elif player_choice == 6:
+            save = input('Save game before Exit? (Yes/No): ')
+            if save.lower() == 'y' or save.lower() == 'yes':
+                save_game(player1)
             print('Goodbye')
             break
         else:
-            print('Unwrite choice')
+            print('Wrong choice')
 
 
 if __name__ == "__main__":

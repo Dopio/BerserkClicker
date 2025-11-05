@@ -6,6 +6,20 @@
         self.player_damage = player_damage
         self.player_health = player_health
 
+    def to_dict(self):
+        return {
+            'name': self.player_name,
+            'blood': self.player_blood,
+            'kills': self.player_kills,
+            'damage': self.player_damage,
+            'health': self.player_health
+        }
+
+    @classmethod  # Указывает на сам класс, а не на экземпляр класса
+    def from_dict_to_class(cls, data):
+        player = cls(data['name'], data['blood'], data['kills'], data['damage'], data['health'])
+        return player
+
     def show_player_stats(self):
         print(f'Player name: {self.player_name} \n'
               f'Blood count: {self.player_blood} \n'
@@ -30,33 +44,38 @@
         print(f'Healing potion is drink! Now you have {self.player_health} HP\n')
 
     def buy_upgrade(self):
-        print(f'Which upgrade you want? '
-              f'You have {self.player_blood} for updates')
+        while True:
+            print(f'Which upgrade you want?\n'
+                  f'You have {self.player_blood} for updates\n'
+                  f'Damage: {self.player_damage} HP: {self.player_health}')
 
-        print(f'1) Increase your damage: +1   (cost 2 blood)\n'
-              f'2) Increase your damage: +2   (cost 5 blood)\n'
-              f'3) Increase your damage: +3   (cost 8 blood)\n'
-              f'4) Heal potion: +5 HP (cost 2 blood)')
+            print(f'1) Increase your damage: +1   (cost 2 blood)\n'
+                  f'2) Increase your damage: +2   (cost 5 blood)\n'
+                  f'3) Increase your damage: +3   (cost 8 blood)\n'
+                  f'4) Heal potion: +5 HP (cost 2 blood)\n'
+                  f'5) Close shop')
 
-        player_choice = int(input())
-        if player_choice == 1 and self.player_blood >= 2:
-            self.player_damage += 1
-            self.player_blood -= 2
-            print(f'Your damage now is: {self.player_damage}')
-        elif player_choice == 2 and self.player_blood >= 5:
-            self.player_damage += 2
-            self.player_blood -= 5
-            print(f'Your damage now is: {self.player_damage}')
-        elif player_choice == 3 and self.player_blood >= 8:
-            self.player_damage += 3
-            self.player_blood -= 8
-            print(f'Your damage now is: {self.player_damage}')
-        elif player_choice == 4 and self.player_blood >= 2:
-            self.player_health += 5
-            self.player_blood -= 2
-            print(f'Your HP now is: {self.player_health}')
-        else:
-            print('Not enough blood')
+            player_choice = int(input())
+            if player_choice == 1 and self.player_blood >= 2:
+                self.player_damage += 1
+                self.player_blood -= 2
+                print(f'Your damage now is: {self.player_damage}')
+            elif player_choice == 2 and self.player_blood >= 5:
+                self.player_damage += 2
+                self.player_blood -= 5
+                print(f'Your damage now is: {self.player_damage}')
+            elif player_choice == 3 and self.player_blood >= 8:
+                self.player_damage += 3
+                self.player_blood -= 8
+                print(f'Your damage now is: {self.player_damage}')
+            elif player_choice == 4 and self.player_blood >= 2:
+                self.player_health += 5
+                self.player_blood -= 2
+                print(f'Your HP now is: {self.player_health}')
+            elif player_choice == 5:
+                break
+            else:
+                print('Not enough blood')
 
 
 class Mob:
