@@ -45,7 +45,6 @@ def fight_with_enemy(player, enemy):
 
 
 def game_loop():
-
     player1 = load_game()
 
     if player1 is None:

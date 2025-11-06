@@ -1,0 +1,22 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Berserk Clicker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🩸 BERSERK CLICKER 🗡️</h1>
+        <p>Hello, Warrior! The game is coming soon...</p>
+        <div id="game-stats">
+            <p>Player: Guts</p>
+            <p>Health: 100</p>
+            <p>Blood: 0</p>
+        </div>
+        <button onclick="attack()">⚔️ Attack Enemy</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
