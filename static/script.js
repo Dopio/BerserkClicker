@@ -29,15 +29,40 @@ async function attackRandom() {
         });
         
         const result = await response.json();
-        
-        // Показываем результат боя
         const battleLog = document.getElementById('battle-log');
-        battleLog.innerHTML = `<p class="battle-message">${result.message}</p>`;
-        
-        // Обновляем статистику
+
+        if (result.message) {
+            battleLog.innerHTML = `<p class="battle-message">${result.message}</p>`;
+        } else if (result.error) {
+            battleLog.innerHTML = `<p class="battle-message">❌ ${result.error}</p>`;
+        }
+
         loadStats();
         
     } catch (error) {
         console.error('Error attacking:', error);
     }
 }
+
+
+async function buyDamageUpgrade() {
+    try {
+        const response = await fetch('/api/upgrade/damage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+
+        const battleLog = document.getElementById('battle-log');
+        battleLog.innerHTML = `<p class="battle-message">${result.message}</p>`;
+
+        loadStats();
+
+    } catch (error) {
+        console.error('Error upgrading:', error);
+    }
+}
+

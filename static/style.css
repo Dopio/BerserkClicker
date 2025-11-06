@@ -56,3 +56,21 @@ button:hover {
     border-radius: 5px;
     margin: 20px 0;
 }
+
+.error-message {
+    color: #ff4444;
+    font-weight: bold;
+    background: #2a1a1a;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #ff4444;
+}
+
+.respawn-message {
+    color: #44ff44;
+    font-weight: bold;
+    background: #1a2a1a;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #44ff44;
+}
