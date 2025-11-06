@@ -1,4 +1,4 @@
-from entities import Mob
+from game.entities import Mob
 
 
 basic_enemies = [

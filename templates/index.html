@@ -1,4 +1,3 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,13 +7,22 @@
 <body>
     <div class="container">
         <h1>🩸 BERSERK CLICKER 🗡️</h1>
-        <p>Hello, Warrior! The game is coming soon...</p>
-        <div id="game-stats">
-            <p>Player: Guts</p>
-            <p>Health: 100</p>
-            <p>Blood: 0</p>
+
+        <div id="player-stats">
+            <h2>Player Stats</h2>
+            <p>Name: <span id="player-name">-</span></p>
+            <p>Health: <span id="player-health">-</span></p>
+            <p>Blood: <span id="player-blood">-</span></p>
+            <p>Kills: <span id="player-kills">-</span></p>
+            <p>Damage: <span id="player-damage">-</span></p>
         </div>
-        <button onclick="attack()">⚔️ Attack Enemy</button>
+
+        <div class="actions">
+            <button onclick="attackRandom()">⚔️ Attack Random Enemy</button>
+            <button onclick="loadStats()">🔄 Refresh Stats</button>
+        </div>
+
+        <div id="battle-log"></div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>

@@ -2,7 +2,6 @@ from flask import Flask, render_template, jsonify
 from game.enemies import basic_enemies
 from game.entities import Player
 import random
-import json
 
 app = Flask(__name__)
 
@@ -37,6 +36,30 @@ def get_enemies():
             'is_alive': enemy.health > 0
         })
     return jsonify(enemies_data)
+
+
+@app.route('/api/attack/random', methods=['POST'])
+def attack_random():
+    alive_enemies = [e for e in basic_enemies if e.health > 0]
+    if not alive_enemies:
+        return jsonify({'error': 'All enemies is dead!'})
+
+    enemy = random.choice(alive_enemies)
+
+    enemy.health -= player.player_damage
+    player.player_blood += player.player_damage
+
+    result = {
+        'message': f'{player.player_name} attack {enemy.name} for {player.player_damage} damage!',
+        'enemy_health': enemy.health,
+        'player_blood': player.player_blood
+    }
+
+    if enemy.health <= 0:
+        player.player_kills += 1
+        result['message'] = f'You kill {enemy.name}'
+
+    return jsonify(result)
 
 
 if __name__ == '__main__':
