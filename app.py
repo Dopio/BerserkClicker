@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify
 from game.enemies import basic_enemies
 from game.entities import Player
 import random
+import json
 
 app = Flask(__name__)
 
