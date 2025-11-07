@@ -5,7 +5,7 @@ import random
 
 app = Flask(__name__)
 
-player = Player('Guts', 0, 0, 1, 10)
+player = Player('Guts', 0, 0, 1, 10, True)
 
 
 @app.route('/')
@@ -16,11 +16,12 @@ def hello_word():
 @app.route('/api/player/stats')
 def get_player_stats():
     return jsonify({
-        'name': player.player_name,
-        'blood': player.player_blood,
-        'kills': player.player_kills,
-        'damage': player.player_damage,
-        'health': player.player_health
+        'player_name': player.player_name,
+        'player_blood': player.player_blood,
+        'player_kills': player.player_kills,
+        'player_damage': player.player_damage,
+        'player_health': player.player_health,
+        'player_is_alive': player.player_is_alive
     })
 
 
@@ -29,11 +30,11 @@ def get_enemies():
     enemies_data = []
     for i, enemy in enumerate(basic_enemies):
         enemies_data.append({
-            'id': i,
-            'name': enemy.name,
-            'health': enemy.health,
-            'damage': enemy.damage,
-            'is_alive': enemy.health > 0
+            'enemy_id': i,
+            'enemy_name': enemy.name,
+            'enemy_health': enemy.health,
+            'enemy_damage': enemy.damage,
+            'enemy_is_alive': enemy.health > 0
         })
     return jsonify(enemies_data)
 
@@ -102,6 +103,52 @@ def upgrade_health():
             'success': False,
             'message': 'Not enough blood, need 5 blood'
         }
+    return jsonify(result)
+
+
+@app.route('/api/attack/<int:enemy_id>', methods=['POST'])
+def attack_specific_enemy(enemy_id):
+
+    if enemy_id < 0 or enemy_id >= len(basic_enemies):
+        return jsonify({'error': 'Invalid enemy ID'})
+
+    enemy = basic_enemies[enemy_id]
+    print(f'Id: {enemy_id} Name: {enemy.name} HP: {enemy.health} Alive: {enemy.health > 0}')
+
+    if enemy.health <= 0:
+        return jsonify({'error': 'Enemy is dead!'})
+    elif player.player_health <= 0:
+        return jsonify({'error': 'You are Dead!'})
+
+    enemy.health -= player.player_damage
+    player.player_health -= enemy.damage
+    player.player_blood += player.player_damage
+
+    enemy_is_alive = enemy.health > 0
+    player_is_alive = player.player_is_alive > 0
+
+    result = {
+        'success': True,
+        'message': f'Player {player.player_name} attack {enemy.name}',
+        'enemy_health': enemy.health,
+        'player_health': player.player_health,
+        'player_blood': player.player_blood,
+        'player_kills': player.player_kills,
+        'enemy_is_alive': enemy_is_alive,
+        'player_is_alive': player_is_alive
+    }
+
+    if enemy.health <= 0:
+        player.player_kills += 1
+        result['message'] = f'You kill {enemy.name}'
+        result['enemy_is_alive'] = False
+        result['player_kills'] = player.player_kills
+
+    if player.player_health <= 0:
+        result['message'] = f'YOU DIED! GAME OVER'
+        result['player_is_alive'] = False
+        result['success'] = False
+
     return jsonify(result)
 
 

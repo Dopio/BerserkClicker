@@ -8,6 +8,7 @@
     <div class="container">
         <h1>🩸 BERSERK CLICKER 🗡️</h1>
 
+        <!-- Статистика игрока -->
         <div id="player-stats">
             <h2>Player Stats</h2>
             <p>Name: <span id="player-name">-</span></p>
@@ -17,13 +18,25 @@
             <p>Damage: <span id="player-damage">-</span></p>
         </div>
 
+        <!-- Кнопки действий -->
         <div class="actions">
             <button onclick="attackRandom()">⚔️ Attack Random Enemy</button>
+            <button onclick="loadEnemies()">👹 Refresh Enemies</button>
             <button onclick="loadStats()">🔄 Refresh Stats</button>
             <button onclick="buyDamageUpgrade()">🛒 Upgrade Damage (Cost: 2 blood)</button>
-            <button onclick="buyHealthUpgrade()">🛒 Upgrade Health (Cost: 5 blood)</button>
+            <button onclick="buyHealthUpgrade()">❤️ Upgrade Health (Cost: 5 blood)</button>
         </div>
 
+        <!-- Список врагов -->
+        <div id="enemies-section">
+            <h2>🎯 Select Enemy to Attack</h2>
+            <div id="enemies-list">
+                <!-- JavaScript вставит врагов сюда -->
+                <p>Loading enemies...</p>
+            </div>
+        </div>
+
+        <!-- Лог боя -->
         <div id="battle-log"></div>
     </div>
 

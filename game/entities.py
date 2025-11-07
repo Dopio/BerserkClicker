@@ -1,23 +1,32 @@
 ﻿class Player:
-    def __init__(self, player_name, player_blood, player_kills, player_damage, player_health):
+    def __init__(self, player_name, player_blood, player_kills, player_damage, player_health, player_is_alive):
         self.player_name = player_name
         self.player_blood = player_blood
         self.player_kills = player_kills
         self.player_damage = player_damage
         self.player_health = player_health
+        self.player_is_alive = player_is_alive
 
     def to_dict(self):
         return {
-            'name': self.player_name,
-            'blood': self.player_blood,
-            'kills': self.player_kills,
-            'damage': self.player_damage,
-            'health': self.player_health
+            'player_name': self.player_name,
+            'player_blood': self.player_blood,
+            'player_kills': self.player_kills,
+            'player_damage': self.player_damage,
+            'player_health': self.player_health,
+            'player_is_alive': self.player_is_alive
         }
 
     @classmethod  # Указывает на сам класс, а не на экземпляр класса
     def from_dict_to_class(cls, data):
-        player = cls(data['name'], data['blood'], data['kills'], data['damage'], data['health'])
+        player = cls(
+            data['player_name'],
+            data['player_blood'],
+            data['player_kills'],
+            data['player_damage'],
+            data['player_health'],
+            data['player_is_alive']
+        )
         return player
 
     def show_player_stats(self):
@@ -79,11 +88,12 @@
 
 
 class Mob:
-    def __init__(self, name, health, damage, gold_reward):
+    def __init__(self, name, health, damage, gold_reward, is_alive):
         self.name = name
         self.health = health
         self.damage = damage
         self.gold_reward = gold_reward
+        self.is_alive = is_alive
 
     def take_damage(self, damage):
         self.health -= damage
