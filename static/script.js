@@ -66,3 +66,25 @@ async function buyDamageUpgrade() {
     }
 }
 
+
+async function buyHealthUpgrade() {
+    try {
+        const response = await fetch('/api/upgrade/health', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+
+        const battleLog = document.getElementById('battle-log');
+        battleLog.innerHTML = `<p class="battle-message">${result.message}</p>`;
+
+        loadStats();
+
+    } catch (error) {
+        console.error('Error upgrading:', error);
+    }
+}
+

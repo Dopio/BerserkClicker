@@ -40,7 +40,6 @@ def get_enemies():
 
 @app.route('/api/attack/random', methods=['POST'])
 def attack_random():
-
     for i, enemy in enumerate(basic_enemies):
         print(f'{i}: {enemy.name} - HP: {enemy.health} - Alive: {enemy.health > 0}')
 
@@ -83,6 +82,25 @@ def upgrade_damage():
         result = {
             'success': False,
             'message': 'Not enough blood, need 2 blood'
+        }
+    return jsonify(result)
+
+
+@app.route('/api/upgrade/health', methods=['POST'])
+def upgrade_health():
+    if player.player_blood >= 5:
+        player.player_health += 2
+        player.player_blood -= 5
+        result = {
+            'success': True,
+            'message': f'{player.player_name} health increased by 2 to {player.player_health}',
+            'player_health': player.player_health,
+            'player_blood': player.player_blood
+        }
+    else:
+        result = {
+            'success': False,
+            'message': 'Not enough blood, need 5 blood'
         }
     return jsonify(result)
 
