@@ -1,10 +1,11 @@
 ﻿class Player:
-    def __init__(self, player_name, player_blood, player_kills, player_damage, player_health, player_is_alive):
+    def __init__(self, player_name, player_blood, player_kills, player_damage, player_health, player_max_health, player_is_alive):
         self.player_name = player_name
         self.player_blood = player_blood
         self.player_kills = player_kills
         self.player_damage = player_damage
         self.player_health = player_health
+        self.player_max_health = player_max_health
         self.player_is_alive = player_is_alive
 
     def to_dict(self):
@@ -14,6 +15,7 @@
             'player_kills': self.player_kills,
             'player_damage': self.player_damage,
             'player_health': self.player_health,
+            'player_max_health': self.player_max_health,
             'player_is_alive': self.player_is_alive
         }
 
@@ -25,6 +27,7 @@
             data['player_kills'],
             data['player_damage'],
             data['player_health'],
+            data['player_max_health'],
             data['player_is_alive']
         )
         return player
@@ -88,9 +91,10 @@
 
 
 class Mob:
-    def __init__(self, name, health, damage, gold_reward, is_alive):
+    def __init__(self, name, health, max_health, damage, gold_reward, is_alive):
         self.name = name
         self.health = health
+        self.max_health = max_health
         self.damage = damage
         self.gold_reward = gold_reward
         self.is_alive = is_alive

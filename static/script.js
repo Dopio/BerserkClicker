@@ -21,6 +21,38 @@ async function loadStats() {
     }
 }
 
+async function resetGame() {
+    try {
+        console.log('Resetting game...');
+
+        const response = await fetch('/api/game/reset', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+        console.log('Reset result:', result);
+
+        const battleLog = document.getElementById('battle-log');
+
+        if (result.success) {
+            battleLog.innerHTML = `<p class="respawn-message">${result.message}</p>`;
+            // Обновляем статистику и врагов после сброса
+            loadStats();
+            loadEnemies();
+        } else {
+            battleLog.innerHTML = `<p class="error-message">Error resetting game</p>`;
+        }
+
+    } catch (error) {
+        console.error('Error resetting game:', error);
+        document.getElementById('battle-log').innerHTML =
+            `<p class="error-message">Error: ${error.message}</p>`;
+    }
+}
+
 // Функция атаки случайного врага
 async function attackRandom() {
     try {
