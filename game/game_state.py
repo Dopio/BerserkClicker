@@ -45,10 +45,16 @@ class GameState:
             }
 
         enemy.health -= self.player.player_damage
-        self.player.player_health -= enemy.damage
-        self.player.player_blood += self.player.player_damage
-
         enemy_is_alive = enemy.health > 0
+
+        # Враг не атакует, если игрок наносит добивающий удар
+        # При смерти враг не даёт больше крови, чем у него оставалось ХП
+        if enemy_is_alive:
+            self.player.player_health -= enemy.damage
+            self.player.player_blood += self.player.player_damage
+        else:
+            self.player.player_blood += self.player.player_damage + enemy.health
+
         player_is_alive = self.player.player_is_alive > 0
 
         result = {
