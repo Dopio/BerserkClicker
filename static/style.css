@@ -331,3 +331,21 @@ button {
 .actions button:nth-child(6):hover {
     background: linear-gradient(145deg, #5a5a5a, #3a3a3a);
 }
+
+#wave-info {
+    background: rgba(139, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border-left: 4px solid #8B0000;
+}
+
+#wave-info h3 {
+    margin: 0;
+    color: #FFD700;
+}
+
+#wave-info p {
+    margin: 5px 0 0 0;
+    color: #ccc;
+}

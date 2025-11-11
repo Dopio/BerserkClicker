@@ -35,7 +35,7 @@ def get_player_stats() -> Response:
 @app.route('/api/enemies')
 def get_enemies() -> Response:
     enemies_data = []
-    for i, enemy in enumerate(game_state.enemies):
+    for i, enemy in enumerate(game_state.current_enemies):
         enemies_data.append({
             'enemy_id': i,
             'enemy_name': enemy.name,

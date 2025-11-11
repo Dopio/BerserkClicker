@@ -1,15 +1,39 @@
 from game.entities import Player
-from game.enemies import basic_enemies
+from game.enemies import basic_enemies, apostle_enemies, boss_enemies
 from game.config import GameConfig
 
 
 class GameState:
     def __init__(self):
         self.player = None
-        self.enemies = basic_enemies
+        self.current_wave = 0
+        self.waves = []
+        self.current_enemies = []
         self.reset_game()
 
-    def reset_game(self):
+    def setup_waves(self):
+        self.waves = [
+            {
+                'name': 'basic_enemies',
+                'enemies': basic_enemies,
+                'required_kills': 4,
+                'unlock_message': 'Basic_enemies are defeated!'
+            },
+            {
+                'name': 'boss_enemies',
+                'enemies': boss_enemies,
+                'required_kills': 3,
+                'unlock_message': 'boss_enemies are defeated!'
+            },
+            {
+                'name': 'apostle_enemies',
+                'enemies': apostle_enemies,
+                'required_kills': 2,
+                'unlock_message': 'apostle_enemies are defeated!'
+            }
+        ]
+
+    def reset_game(self) -> None:
         self.player = Player(
             GameConfig.PLAYER_NAME,
             GameConfig.STARTING_PLAYER_BLOOD,
@@ -19,12 +43,34 @@ class GameState:
             GameConfig.STARTING_PLAYER_MAX_HEALTH,
             True
         )
+        self.current_wave = 0
+        self.setup_waves()
+        self.spawn_wave()
+        return None
 
-        for enemy in self.enemies:
-            enemy.health = enemy.max_health
+    def spawn_wave(self) -> None:
+        if self.current_wave < len(self.waves):
+            wave = self.waves[self.current_wave]
+            self.current_enemies = wave['enemies'].copy()
+            print(f"Wave {self.current_wave + 1}: {wave['name']} spawned!")
+        return None
+
+    def check_wave_progress(self) -> str | None:
+        if self.current_wave >= len(self.waves):
+            return None
+        concurrent_wave_data = self.waves[self.current_wave]
+        killed_in_wave = sum(1 for enemy in concurrent_wave_data['enemies'] if enemy.health <= 0)
+        if killed_in_wave > concurrent_wave_data['required_kills']:
+            self.current_wave += 1
+            if self.current_wave < len(self.waves):
+                self.spawn_wave()
+                return concurrent_wave_data['unlock_message']
+        else:
+            return 'ALL WAVES ARE CLEARED!'
+        return None
 
     def get_alive_enemies(self):
-        return [enemy for enemy in self.enemies if enemy.health > 0]
+        return [enemy for enemy in self.waves[self.current_wave] if enemy.health > 0]
 
     def perform_attack(self, enemy, enemy_id: int | None = None) -> dict:
 
@@ -73,6 +119,11 @@ class GameState:
             result['message'] = f'You kill {enemy.name}'
             result['enemy_is_alive'] = False
             result['player_kills'] = self.player.player_kills
+
+            wave_message = self.check_wave_progress()
+            if wave_message:
+                result['wave_message'] = wave_message
+                result['new_wave'] = self.current_wave + 1
 
         if self.player.player_health <= 0:
             result['message'] = f'YOU DIED! GAME OVER'

@@ -194,3 +194,48 @@ async function attackSpecificEnemy(enemyId) {
         document.getElementById('battle-log').innerHTML = `<p class="error-message">Error: ${error.message}</p>`;
     }
 }
+
+async function loadGameState() {
+    try {
+        const response = await fetch('/api/game/state');
+        const state = await response.json();
+
+        document.getElementById('current-wave').textContent = state.current_wave;
+        document.getElementById('total-waves').textContent = state.total_waves;
+        document.getElementById('wave-name').textContent = state.wave_name;
+
+    } catch (error) {
+        console.error('Error loading game state:', error);
+    }
+}
+
+// Обновляем attackSpecificEnemy чтобы обрабатывать волны
+async function attackSpecificEnemy(enemyId) {
+    try {
+        const response = await fetch(`/api/attack/${enemyId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+        const battleLog = document.getElementById('battle-log');
+
+        if (result.message) {
+            let message = `<p class="battle-message">${result.message}</p>`;
+
+            // Добавляем сообщение о новой волне если есть
+            if (result.wave_message) {
+                message += `<p class="respawn-message">🎉 ${result.wave_message}</p>`;
+            }
+
+            battleLog.innerHTML = message;
+        }
+
+        loadStats();
+        loadEnemies();
+        loadGameState(); // Обновляем информацию о волне
+
+    } catch (error) {
+        console.error('Error attacking enemy:', error);
+    }
+}
