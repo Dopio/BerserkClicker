@@ -75,5 +75,42 @@ class GameState:
 
         return result
 
+    def buy_upgrade(self, upgrade_type: str, cost: int) -> dict:
+        if self.player.player_blood < cost:
+            return {
+                'success': False,
+                'message': f'Not enough blood, need {cost} blood'
+            }
+        upgrades = {
+            'upgrade_damage': {
+                'action': lambda: setattr(self.player, 'player_damage', self.player.player_damage + 1),
+                'message': f'{self.player.player_name} damage increased by 1 to {self.player.player_damage}'
+            },
+            'upgrade_health': {
+                'action': lambda: setattr(self.player, 'player_health', self.player.player_health + 5),
+                'message': f'{self.player.player_name} health increased by 5 to {self.player.player_health}'
+            }
+        }
+
+        if upgrade_type not in upgrades:
+            return {
+                'success': False,
+                'message': f'Unknown upgrade type: {upgrade_type} ',
+            }
+
+        upgrade = upgrades[upgrade_type]
+        upgrade['action']()
+        self.player.player_blood -= cost
+
+        result = {
+            'success': True,
+            'message': f'{game_state.player.player_name} {upgrade["message"]}',
+            'player_damage': self.player.player_damage,
+            'player_health': self.player.player_health,
+            'player_blood': self.player.player_blood
+        }
+
+        return result
+
 
 game_state = GameState()

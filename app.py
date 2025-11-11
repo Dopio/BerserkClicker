@@ -75,39 +75,20 @@ def attack_specific_enemy(enemy_id) -> Response:
 
 @app.route('/api/upgrade/damage', methods=['POST'])
 def upgrade_damage() -> Response:
-    if game_state.player.player_blood >= 2:
-        game_state.player.player_damage += 1
-        game_state.player.player_blood -= 2
-        result = {
-            'success': True,
-            'message': f'{game_state.player.player_name} damage increased by 1 to {game_state.player.player_damage}',
-            'player_damage': game_state.player.player_damage,
-            'player_blood': game_state.player.player_blood
-        }
-    else:
-        result = {
-            'success': False,
-            'message': 'Not enough blood, need 2 blood'
-        }
+    cost = 2
+    upgrade_type = 'upgrade_damage'
+    result = game_state.buy_upgrade(upgrade_type, cost)
+
     return jsonify(result)
 
 
 @app.route('/api/upgrade/health', methods=['POST'])
 def upgrade_health() -> Response:
-    if game_state.player.player_blood >= 5:
-        game_state.player.player_health += 2
-        game_state.player.player_blood -= 5
-        result = {
-            'success': True,
-            'message': f'{game_state.player.player_name} health increased by 2 to {game_state.player.player_health}',
-            'player_health': game_state.player.player_health,
-            'player_blood': game_state.player.player_blood
-        }
-    else:
-        result = {
-            'success': False,
-            'message': 'Not enough blood, need 5 blood'
-        }
+
+    cost = 2
+    upgrade_type = 'upgrade_health'
+    result = game_state.buy_upgrade(upgrade_type, cost)
+
     return jsonify(result)
 
 
