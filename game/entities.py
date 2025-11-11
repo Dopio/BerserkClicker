@@ -8,7 +8,7 @@
         self.player_max_health = player_max_health
         self.player_is_alive = player_is_alive
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             'player_name': self.player_name,
             'player_blood': self.player_blood,
@@ -20,7 +20,7 @@
         }
 
     @classmethod  # Указывает на сам класс, а не на экземпляр класса
-    def from_dict_to_class(cls, data):
+    def from_dict_to_class(cls, data: dict) -> object:
         player = cls(
             data['player_name'],
             data['player_blood'],
@@ -103,6 +103,7 @@ class Mob:
         self.health -= damage
         if self.health <= 0:
             return "Death"
+        return None
 
     def mob_attack(self, player):
         if player.player_health > 0:

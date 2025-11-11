@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, Response
 from game.game_state import game_state
 import random
 
@@ -11,7 +11,7 @@ def hello_word():
 
 
 @app.route('/api/game/reset', methods=['POST'])
-def reset_game():
+def reset_game() -> Response:
     game_state.reset_game()
     return jsonify({
         'success': True,
@@ -20,7 +20,7 @@ def reset_game():
 
 
 @app.route('/api/player/stats')
-def get_player_stats():
+def get_player_stats() -> Response:
     return jsonify({
         'player_name': game_state.player.player_name,
         'player_blood': game_state.player.player_blood,
@@ -33,7 +33,7 @@ def get_player_stats():
 
 
 @app.route('/api/enemies')
-def get_enemies():
+def get_enemies() -> Response:
     enemies_data = []
     for i, enemy in enumerate(game_state.enemies):
         enemies_data.append({
@@ -48,36 +48,33 @@ def get_enemies():
 
 
 @app.route('/api/attack/random', methods=['POST'])
-def attack_random():
-    for i, enemy in enumerate(game_state.enemies):
-        print(f'{i}: {enemy.name} - HP: {enemy.health} - Alive: {enemy.health > 0}')
+def attack_random() -> Response:
 
-    alive_enemies = [e for e in game_state.enemies if e.health > 0]
-    print(f"Alive enemies count: {len(alive_enemies)}")
+    alive_enemies = game_state.get_alive_enemies()
 
     if not alive_enemies:
         return jsonify({'error': 'All enemies is dead!'})
 
     enemy = random.choice(alive_enemies)
+    result = game_state.perform_attack(enemy)
 
-    enemy.health -= game_state.player.player_damage
-    game_state.player.player_blood += game_state.player.player_damage
+    return jsonify(result)
 
-    result = {
-        'message': f'{game_state.player.player_name} attack {enemy.name} for {game_state.player.player_damage} damage!',
-        'enemy_health': enemy.health,
-        'player_blood': game_state.player.player_blood
-    }
 
-    if enemy.health <= 0:
-        game_state.player.player_kills += 1
-        result['message'] = f'You kill {enemy.name}'
+@app.route('/api/attack/<int:enemy_id>', methods=['POST'])
+def attack_specific_enemy(enemy_id) -> Response:
+
+    if enemy_id < 0 or enemy_id >= len(game_state.enemies):
+        return jsonify({'error': 'Invalid enemy ID'})
+
+    enemy = game_state.enemies[enemy_id]
+    result = game_state.perform_attack(enemy, enemy_id)
 
     return jsonify(result)
 
 
 @app.route('/api/upgrade/damage', methods=['POST'])
-def upgrade_damage():
+def upgrade_damage() -> Response:
     if game_state.player.player_blood >= 2:
         game_state.player.player_damage += 1
         game_state.player.player_blood -= 2
@@ -96,7 +93,7 @@ def upgrade_damage():
 
 
 @app.route('/api/upgrade/health', methods=['POST'])
-def upgrade_health():
+def upgrade_health() -> Response:
     if game_state.player.player_blood >= 5:
         game_state.player.player_health += 2
         game_state.player.player_blood -= 5
@@ -111,52 +108,6 @@ def upgrade_health():
             'success': False,
             'message': 'Not enough blood, need 5 blood'
         }
-    return jsonify(result)
-
-
-@app.route('/api/attack/<int:enemy_id>', methods=['POST'])
-def attack_specific_enemy(enemy_id):
-
-    if enemy_id < 0 or enemy_id >= len(game_state.enemies):
-        return jsonify({'error': 'Invalid enemy ID'})
-
-    enemy = game_state.enemies[enemy_id]
-    print(f'Id: {enemy_id} Name: {enemy.name} HP: {enemy.health} Alive: {enemy.health > 0}')
-
-    if enemy.health <= 0:
-        return jsonify({'error': 'Enemy is dead!'})
-    elif game_state.player.player_health <= 0:
-        return jsonify({'error': 'You are Dead!'})
-
-    enemy.health -= game_state.player.player_damage
-    game_state.player.player_health -= enemy.damage
-    game_state.player.player_blood += game_state.player.player_damage
-
-    enemy_is_alive = enemy.health > 0
-    player_is_alive = game_state.player.player_is_alive > 0
-
-    result = {
-        'success': True,
-        'message': f'Player {game_state.player.player_name} attack {enemy.name}',
-        'enemy_health': enemy.health,
-        'player_health': game_state.player.player_health,
-        'player_blood': game_state.player.player_blood,
-        'player_kills': game_state.player.player_kills,
-        'enemy_is_alive': enemy_is_alive,
-        'player_is_alive': player_is_alive
-    }
-
-    if enemy.health <= 0:
-        game_state.player.player_kills += 1
-        result['message'] = f'You kill {enemy.name}'
-        result['enemy_is_alive'] = False
-        result['player_kills'] = game_state.player.player_kills
-
-    if game_state.player.player_health <= 0:
-        result['message'] = f'YOU DIED! GAME OVER'
-        result['player_is_alive'] = False
-        result['success'] = False
-
     return jsonify(result)
 
 
