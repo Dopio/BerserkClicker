@@ -32,6 +32,13 @@ def get_player_stats() -> Response:
     })
 
 
+@app.route('/api/game/state')
+def get_game_state():
+    wave_info = game_state.check_wave_progress()
+    wave_info.pop('wave_changed', None)
+    return jsonify(wave_info)
+
+
 @app.route('/api/enemies')
 def get_enemies() -> Response:
     enemies_data = []

@@ -16,19 +16,19 @@ class GameState:
             {
                 'name': 'basic_enemies',
                 'enemies': basic_enemies,
-                'required_kills': 2,
+                'required_kills': 5,
                 'unlock_message': 'Basic_enemies are defeated!'
             },
             {
                 'name': 'boss_enemies',
                 'enemies': boss_enemies,
-                'required_kills': 3,
+                'required_kills': 5,
                 'unlock_message': 'boss_enemies are defeated!'
             },
             {
                 'name': 'apostle_enemies',
                 'enemies': apostle_enemies,
-                'required_kills': 2,
+                'required_kills': 5,
                 'unlock_message': 'apostle_enemies are defeated!'
             }
         ]
@@ -51,25 +51,72 @@ class GameState:
     def spawn_wave(self) -> None:
         if self.current_wave < len(self.waves):
             wave = self.waves[self.current_wave]
-            self.current_enemies = wave['enemies'].copy()
+            self.current_enemies = wave['enemies']
+
+            for enemy in self.current_enemies:
+                enemy.health = enemy.max_health
+
             print(f"Wave {self.current_wave + 1}: {wave['name']} spawned!")
         return None
 
-    def check_wave_progress(self) -> str | None:
+    def check_wave_progress(self) -> dict:
+
         if self.current_wave >= len(self.waves):
-            return None
-        concurrent_wave_data = self.waves[self.current_wave]
-        killed_in_wave = sum(1 for enemy in concurrent_wave_data['enemies'] if enemy.health <= 0)
-        if killed_in_wave > concurrent_wave_data['required_kills']:
+            wave_info = {
+                'current_wave': len(self.waves),
+                'total_waves': len(self.waves),
+                'wave_name': 'Completed',
+                'killed_in_wave': 0,
+                'required_kills': 0,
+                'player_kills': self.player.player_kills,
+                'wave_message': None,
+                'wave_changed': False
+            }
+            return wave_info
+
+        current_wave_data = self.waves[self.current_wave]
+        killed_in_wave = sum(1 for enemy in current_wave_data['enemies'] if enemy.health <= 0)
+
+        # Базовая информация о волне
+        wave_info = {
+            'current_wave': self.current_wave + 1,
+            'total_waves': len(self.waves),
+            'wave_name': current_wave_data['name'],
+            'killed_in_wave': killed_in_wave,
+            'required_kills': current_wave_data['required_kills'],
+            'player_kills': self.player.player_kills,
+            'wave_message': None,
+            'wave_changed': False
+        }
+
+        # Проверяем, нужно ли переходить к следующей волне
+        if killed_in_wave >= current_wave_data['required_kills']:
             self.current_wave += 1
+            wave_info['wave_changed'] = True
+
             if self.current_wave < len(self.waves):
                 self.spawn_wave()
-                return concurrent_wave_data['unlock_message']
+                wave_info['wave_message'] = current_wave_data['unlock_message']
+                # Обновляем информацию для новой волны
+                new_wave_data = self.waves[self.current_wave]
+                wave_info.update({
+                    'current_wave': self.current_wave,
+                    'wave_name': new_wave_data['name'],
+                    'killed_in_wave': 0,
+                    'required_kills': new_wave_data['required_kills']
+                })
             else:
-                return 'ALL WAVES ARE CLEARED!'
-        return None
+                wave_info['wave_message'] = 'ALL WAVES ARE CLEARED!'
+                wave_info.update({
+                    'current_wave': len(self.waves),
+                    'wave_name': 'Completed',
+                    'killed_in_wave': 0,
+                    'required_kills': 0
+                })
 
-    def get_alive_enemies(self):
+        return wave_info
+
+    def get_alive_enemies(self) -> list:
         return [enemy for enemy in self.current_enemies if enemy.health > 0]
 
     def perform_attack(self, enemy, enemy_id: int | None = None) -> dict:
@@ -120,10 +167,10 @@ class GameState:
             result['enemy_is_alive'] = False
             result['player_kills'] = self.player.player_kills
 
-            wave_message = self.check_wave_progress()
-            if wave_message:
-                result['wave_message'] = wave_message
-                result['new_wave'] = self.current_wave + 1
+            wave_info = self.check_wave_progress()
+            if wave_info['wave_message']:
+                result['wave_message'] = wave_info['wave_message']
+                result['new_wave'] = wave_info['current_wave']
 
         if self.player.player_health <= 0:
             result['message'] = f'YOU DIED! GAME OVER'
@@ -141,11 +188,11 @@ class GameState:
         upgrades = {
             'upgrade_damage': {
                 'action': lambda: setattr(self.player, 'player_damage', self.player.player_damage + 1),
-                'message': f'{self.player.player_name} damage increased by 1 to {self.player.player_damage}'
+                'message': lambda: f'{self.player.player_name} damage increased by 1 to {self.player.player_damage}'
             },
             'upgrade_health': {
                 'action': lambda: setattr(self.player, 'player_health', self.player.player_health + 5),
-                'message': f'{self.player.player_name} health increased by 5 to {self.player.player_health}'
+                'message': lambda: f'{self.player.player_name} health increased by 5 to {self.player.player_health}'
             }
         }
 
@@ -161,7 +208,7 @@ class GameState:
 
         result = {
             'success': True,
-            'message': f'{game_state.player.player_name} {upgrade["message"]}',
+            'message': f'{self.player.player_name} {upgrade["message"]}',
             'player_damage': self.player.player_damage,
             'player_health': self.player.player_health,
             'player_blood': self.player.player_blood

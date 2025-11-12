@@ -2,7 +2,8 @@ console.log('Script loaded successfully!');
 
 document.addEventListener('DOMContentLoaded', function() {
     loadStats();
-    loadEnemies();
+    loadEnemies()
+    loadGameState();
 });
 
 // Функция загрузки статистики игрока
@@ -41,7 +42,8 @@ async function resetGame() {
             battleLog.innerHTML = `<p class="respawn-message">${result.message}</p>`;
             // Обновляем статистику и врагов после сброса
             loadStats();
-            loadEnemies();
+            loadEnemies()
+            loadGameState();
         } else {
             battleLog.innerHTML = `<p class="error-message">Error resetting game</p>`;
         }
@@ -73,7 +75,8 @@ async function attackRandom() {
         }
 
         loadStats();
-        loadEnemies(); // ← ДОБАВЬ: обновляем список врагов после боя
+        loadEnemies();
+        loadGameState()
 
     } catch (error) {
         console.error('Error attacking:', error);
@@ -187,7 +190,8 @@ async function attackSpecificEnemy(enemyId) {
         }
 
         loadStats();
-        loadEnemies();
+        loadEnemies()
+        loadGameState();
 
     } catch (error) {
         console.error('Error attacking enemy:', error);
@@ -203,6 +207,13 @@ async function loadGameState() {
         document.getElementById('current-wave').textContent = state.current_wave;
         document.getElementById('total-waves').textContent = state.total_waves;
         document.getElementById('wave-name').textContent = state.wave_name;
+        document.getElementById('wave-kills').textContent = state.killed_in_wave;
+        document.getElementById('wave-required').textContent = state.required_kills;
+
+        // Прогресс бар
+        const progressPercent = state.required_kills > 0 ?
+            (state.killed_in_wave / state.required_kills) * 100 : 0;
+        document.getElementById('wave-progress').style.width = `${progressPercent}%`;
 
     } catch (error) {
         console.error('Error loading game state:', error);
