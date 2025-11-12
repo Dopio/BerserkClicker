@@ -16,7 +16,7 @@ class GameState:
             {
                 'name': 'basic_enemies',
                 'enemies': basic_enemies,
-                'required_kills': 4,
+                'required_kills': 2,
                 'unlock_message': 'Basic_enemies are defeated!'
             },
             {
@@ -65,12 +65,12 @@ class GameState:
             if self.current_wave < len(self.waves):
                 self.spawn_wave()
                 return concurrent_wave_data['unlock_message']
-        else:
-            return 'ALL WAVES ARE CLEARED!'
+            else:
+                return 'ALL WAVES ARE CLEARED!'
         return None
 
     def get_alive_enemies(self):
-        return [enemy for enemy in self.waves[self.current_wave] if enemy.health > 0]
+        return [enemy for enemy in self.current_enemies if enemy.health > 0]
 
     def perform_attack(self, enemy, enemy_id: int | None = None) -> dict:
 

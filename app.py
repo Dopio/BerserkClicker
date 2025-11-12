@@ -64,10 +64,10 @@ def attack_random() -> Response:
 @app.route('/api/attack/<int:enemy_id>', methods=['POST'])
 def attack_specific_enemy(enemy_id) -> Response:
 
-    if enemy_id < 0 or enemy_id >= len(game_state.enemies):
+    if enemy_id < 0 or enemy_id >= len(game_state.current_enemies):
         return jsonify({'error': 'Invalid enemy ID'})
 
-    enemy = game_state.enemies[enemy_id]
+    enemy = game_state.current_enemies[enemy_id]
     result = game_state.perform_attack(enemy, enemy_id)
 
     return jsonify(result)

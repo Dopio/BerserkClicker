@@ -1,5 +1,13 @@
 ﻿class Player:
-    def __init__(self, player_name, player_blood, player_kills, player_damage, player_health, player_max_health, player_is_alive):
+    def __init__(self,
+                 player_name,
+                 player_blood,
+                 player_kills,
+                 player_damage,
+                 player_health,
+                 player_max_health,
+                 player_is_alive):
+
         self.player_name = player_name
         self.player_blood = player_blood
         self.player_kills = player_kills
