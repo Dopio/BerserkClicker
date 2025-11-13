@@ -1,8 +1,11 @@
 from flask import Flask, render_template, jsonify, Response
 from game.game_state import game_state
+from routes.save_routes import save_bp
 import random
 
 app = Flask(__name__)
+
+app.register_blueprint(save_bp)
 
 
 @app.route('/')

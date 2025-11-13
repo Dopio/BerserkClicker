@@ -98,6 +98,7 @@
                 print('Not enough blood')
 
 
+
 class Mob:
     def __init__(self, name, health, max_health, damage, gold_reward, is_alive):
         self.name = name

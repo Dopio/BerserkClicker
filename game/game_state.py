@@ -1,15 +1,86 @@
 from game.entities import Player
 from game.enemies import basic_enemies, apostle_enemies, boss_enemies
+from game.database import PostgresDatabase
 from game.config import GameConfig
 
 
 class GameState:
     def __init__(self):
+        self.db = PostgresDatabase()
         self.player = None
         self.current_wave = 0
         self.waves = []
         self.current_enemies = []
-        self.reset_game()
+        self.load_game()
+
+    def load_game(self):
+        player_data = self.db.load_player()
+
+        if player_data:
+            self.player = Player(
+                player_data['name'],
+                player_data['blood'],
+                player_data['kills'],
+                player_data['damage'],
+                player_data['health'],
+                player_data['max_health'],
+                player_data['is_alive']
+            )
+            print("Player loaded from PostgresSQL!")
+
+            state_data = self.db.load_game_state()
+            if state_data:
+                self.current_wave = state_data['current_wave']
+                print(f'Loaded wave: {self.current_wave}')
+            else:
+                self.current_wave = 0
+                print('Starting from wave 0')
+        else:
+            self.reset_game()
+            print('New game started!')
+
+        self.setup_waves()
+        self.spawn_wave()
+
+    def save_game(self):
+        player_data = {
+            'name': self.player.player_name,
+            'blood': self.player.player_blood,
+            'kills': self.player.player_kills,
+            'damage': self.player.player_damage,
+            'health': self.player.player_health,
+            'max_health': self.player.player_max_health,
+            'is_alive': self.player.player_is_alive
+        }
+
+        success = self.db.save_player(player_data)
+
+        # Сохраняем состояние игры
+        if success:
+            self.db.save_game_state(
+                self.player.player_name,
+                self.current_wave,
+                self.player.player_kills
+            )
+
+        print("💾 Game saved to PostgresSQL!" if success else "❌ Failed to save game!")
+
+    def reset_game(self):
+        """Сбрасывает игру (но не удаляет из БД)"""
+        self.player = Player(
+            GameConfig.PLAYER_NAME,
+            GameConfig.STARTING_PLAYER_BLOOD,
+            GameConfig.STARTING_PLAYER_KILLS,
+            GameConfig.STARTING_PLAYER_DAMAGE,
+            GameConfig.STARTING_PLAYER_HEALTH,
+            GameConfig.STARTING_PLAYER_MAX_HEALTH,
+            True
+        )
+        self.current_wave = 0
+
+        self.setup_waves()
+        self.spawn_wave()
+        self.save_game()
 
     def setup_waves(self):
         self.waves = [
@@ -33,25 +104,10 @@ class GameState:
             }
         ]
 
-    def reset_game(self) -> None:
-        self.player = Player(
-            GameConfig.PLAYER_NAME,
-            GameConfig.STARTING_PLAYER_BLOOD,
-            GameConfig.STARTING_PLAYER_KILLS,
-            GameConfig.STARTING_PLAYER_DAMAGE,
-            GameConfig.STARTING_PLAYER_HEALTH,
-            GameConfig.STARTING_PLAYER_MAX_HEALTH,
-            True
-        )
-        self.current_wave = 0
-        self.setup_waves()
-        self.spawn_wave()
-        return None
-
     def spawn_wave(self) -> None:
         if self.current_wave < len(self.waves):
             wave = self.waves[self.current_wave]
-            self.current_enemies = wave['enemies']
+            self.current_enemies = wave['enemies'].copy()
 
             for enemy in self.current_enemies:
                 enemy.health = enemy.max_health
